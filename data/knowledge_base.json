@@ -1,0 +1,32 @@
+[
+  {
+    "id": "budgeting_basics",
+    "title": "Budgeting Basics",
+    "content": "A budget is a plan for how income will be used across essential expenses, discretionary spending, and savings. A common baseline is the 50/30/20 framework: 50% needs, 30% wants, 20% savings or debt payoff. Budgets work best when reviewed monthly and adjusted for irregular expenses like insurance or annual subscriptions.\n\nA sustainable budget should capture fixed costs (rent, debt payments), variable costs (groceries, utilities), and sinking funds for predictable future expenses. Automating bills and savings transfers reduces missed payments and improves savings consistency."
+  },
+  {
+    "id": "emergency_fund",
+    "title": "Emergency Fund Strategy",
+    "content": "An emergency fund provides liquidity for unexpected expenses such as medical bills or job loss. A typical target is 3 to 6 months of essential expenses, stored in a high-yield savings account for accessibility. Households with variable income or dependents often prioritize a larger emergency buffer.\n\nTo build the fund efficiently, set a monthly savings goal and treat it like a fixed bill. Once the target is reached, redirect contributions toward longer-term goals or investments."
+  },
+  {
+    "id": "debt_management",
+    "title": "Debt Payoff Approaches",
+    "content": "Two common debt payoff strategies are the avalanche method (pay highest interest rate first) and the snowball method (pay smallest balance first). The avalanche saves more interest over time, while the snowball can improve motivation through quick wins.\n\nWhen budgeting, list all debts with balances, interest rates, and minimum payments. Prioritize high-interest debt before increasing discretionary spending."
+  },
+  {
+    "id": "investing_basics",
+    "title": "Investing Basics and Risk",
+    "content": "Investment returns are influenced by market risk, time horizon, and diversification. Broad index funds provide exposure to a wide range of assets and can reduce single-company risk. A longer time horizon generally allows for more equity exposure, while shorter horizons benefit from higher liquidity and lower volatility.\n\nRisk tolerance is personal and should reflect the ability to stay invested during market downturns. Align asset allocation to goals and timeline rather than recent market performance."
+  },
+  {
+    "id": "interest_rates_inflation",
+    "title": "Interest Rates and Inflation",
+    "content": "Inflation reduces purchasing power over time, which is why long-term savings often require some exposure to assets that can outpace inflation. Interest rates influence borrowing costs and savings yields: higher rates typically increase loan payments but can improve yields on cash savings.\n\nWhen rates rise, fixed-income prices can fall, while newly issued bonds may offer higher yields. Understanding rate sensitivity helps align investments with risk tolerance."
+  },
+  {
+    "id": "goal_planning",
+    "title": "Savings Goal Planning",
+    "content": "Savings goals should specify a target amount, timeframe, and monthly contribution. For example, a $12,000 car fund over 18 months requires about $667 per month. Goals with short timeframes are better suited for cash or low-volatility options, while longer-term goals can include diversified investments.\n\nTracking progress monthly and adjusting contributions for income changes keeps goals realistic and attainable."
+  }
+]

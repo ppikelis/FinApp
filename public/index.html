@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FinApp - Financial Advisor</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="logo">FinApp</div>
+        <nav class="nav">
+          <button class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span>Dashboard</span>
+          </button>
+          <button class="nav-item">
+            <span class="nav-icon">🗂️</span>
+            <span>Accounts</span>
+          </button>
+          <button class="nav-item">
+            <span class="nav-icon">💳</span>
+            <span>Transactions</span>
+          </button>
+          <button class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span>Cash Flow</span>
+          </button>
+          <button class="nav-item">
+            <span class="nav-icon">🕒</span>
+            <span>Reports</span>
+          </button>
+          <button class="nav-item">
+            <span class="nav-icon">🧭</span>
+            <span>Budget</span>
+          </button>
+          <button class="nav-item">
+            <span class="nav-icon">📅</span>
+            <span>Recurring</span>
+          </button>
+          <button class="nav-item">
+            <span class="nav-icon">🎯</span>
+            <span>Goals</span>
+            <span class="nav-badge">Beta</span>
+          </button>
+          <button class="nav-item">
+            <span class="nav-icon">📈</span>
+            <span>Investments</span>
+          </button>
+          <button class="nav-item">
+            <span class="nav-icon">💡</span>
+            <span>Advice</span>
+          </button>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="trial">
+            <span class="muted">Free trial</span>
+            <span class="pill">7 days left</span>
+          </div>
+          <div class="user">
+            <span class="avatar">P</span>
+            <span>Paulius</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h1>Good evening, Paulius!</h1>
+            <p class="muted">Let’s finish setting up your account.</p>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost">Search</button>
+            <button class="primary">Customize</button>
+          </div>
+        </header>
+
+        <section class="card">
+          <h2>Getting Started</h2>
+          <div class="progress">
+            <div class="progress-bar"></div>
+          </div>
+          <ul class="checklist">
+            <li class="done">Add an account</li>
+            <li>Customize categories</li>
+            <li>Create a goal</li>
+            <li>Create a budget</li>
+          </ul>
+        </section>
+
+        <div class="module-grid">
+          <section class="card module">
+            <div class="card-header">
+              <h2>Accounts</h2>
+              <span class="pill">Linked</span>
+            </div>
+            <p class="muted">
+              Upload a bank statement to classify income and expenses.
+            </p>
+            <input id="account-statement" type="file" accept="application/pdf" />
+            <button id="account-upload" class="secondary">Upload & Analyze</button>
+            <div class="account-summary">
+              <div>
+                <span class="muted">Income</span>
+                <strong id="account-income">$0</strong>
+              </div>
+              <div>
+                <span class="muted">Expenses</span>
+                <strong id="account-expenses">$0</strong>
+              </div>
+              <div>
+                <span class="muted">Net</span>
+                <strong id="account-net">$0</strong>
+              </div>
+            </div>
+            <div class="chart-panel">
+              <canvas id="account-chart" width="360" height="180"></canvas>
+            </div>
+            <pre id="account-output" class="output"></pre>
+          </section>
+
+          <section class="card module">
+            <div class="card-header">
+              <h2>Cash Flow</h2>
+              <span class="pill">This month</span>
+            </div>
+            <div class="chart-placeholder">
+              <div class="chart-line"></div>
+              <div class="chart-line muted"></div>
+            </div>
+            <p class="muted">Income and expenses will appear here.</p>
+          </section>
+
+          <section class="card module">
+            <div class="card-header">
+              <h2>Reports</h2>
+              <span class="pill">Monthly</span>
+            </div>
+            <div class="empty-state">Generate spending and category reports.</div>
+          </section>
+
+          <section class="card module">
+            <h2>Budget</h2>
+            <div class="grid">
+              <div>
+                <h3>Manual Input</h3>
+                <label>
+                  Monthly Income
+                  <input id="income" type="number" placeholder="e.g. 4200" />
+                </label>
+                <label>
+                  Expenses (JSON array)
+                  <textarea
+                    id="expenses"
+                    rows="6"
+                    placeholder='[{"description":"Rent","amount":1200},{"description":"Groceries","amount":350}]'
+                  ></textarea>
+                </label>
+                <button id="analyze-manual" class="primary">Analyze</button>
+              </div>
+              <div>
+                <h3>Analysis Result</h3>
+                <pre id="analysis-output" class="output"></pre>
+              </div>
+            </div>
+          </section>
+
+          <section class="card module">
+            <h2>Investments</h2>
+            <p class="muted">Track portfolio allocation and performance.</p>
+            <div class="empty-state">Connect an account to view investments.</div>
+          </section>
+
+          <section class="card module">
+            <h2>Advice</h2>
+            <p class="muted">
+              Uses ChatGPT to summarize market trends and propose strategies to
+              reach your goals.
+            </p>
+            <button id="advisor-btn" class="primary">Get Advisor Insights</button>
+            <pre id="advisor-output" class="output"></pre>
+            <div class="module-divider"></div>
+            <h3>Knowledge Base Search</h3>
+            <p class="muted">
+              Embedded finance knowledge base with chunking and similarity search.
+            </p>
+            <div class="grid">
+              <div>
+                <button id="kb-init" class="secondary">Initialize Knowledge Base</button>
+                <pre id="kb-status" class="output"></pre>
+              </div>
+              <div>
+                <label>
+                  Query
+                  <input id="kb-query" type="text" placeholder="e.g. emergency fund size" />
+                </label>
+                <label>
+                  Top K
+                  <input id="kb-topk" type="number" value="4" min="1" max="8" />
+                </label>
+                <button id="kb-search" class="primary">Search</button>
+                <pre id="kb-results" class="output"></pre>
+              </div>
+            </div>
+          </section>
+
+          <section class="card module">
+            <h2>Goals</h2>
+            <div id="goals-empty" class="goals-empty">
+              <p class="muted">No goals added yet.</p>
+              <button id="goals-add-btn" class="primary">Add goal</button>
+            </div>
+
+            <div id="goals-builder" class="goals-builder hidden">
+              <div class="goals-tabs">
+                <button class="pill active">Select</button>
+                <button class="pill">Targets</button>
+                <button class="pill">Contribution</button>
+                <button class="pill">Budget</button>
+              </div>
+              <h3>Select goals to add</h3>
+              <div class="goals-grid">
+                <button class="goal-card">
+                  <span class="goal-icon">🧯</span>
+                  <span>
+                    <strong>Emergency fund</strong>
+                  </span>
+                </button>
+                <button class="goal-card">
+                  <span class="goal-icon">🏠</span>
+                  <span>
+                    <strong>Down payment</strong>
+                  </span>
+                </button>
+                <button class="goal-card selected">
+                  <span class="goal-icon">🚗</span>
+                  <span>
+                    <strong>Car</strong>
+                    <small>1 goal already added</small>
+                  </span>
+                </button>
+                <button class="goal-card">
+                  <span class="goal-icon">🏖️</span>
+                  <span>
+                    <strong>Vacation</strong>
+                  </span>
+                </button>
+                <button class="goal-card selected">
+                  <span class="goal-icon">💍</span>
+                  <span>
+                    <strong>Wedding</strong>
+                    <small>1 goal already added</small>
+                  </span>
+                </button>
+                <button class="goal-card">
+                  <span class="goal-icon">🎓</span>
+                  <span>
+                    <strong>Education</strong>
+                  </span>
+                </button>
+                <button class="goal-card">
+                  <span class="goal-icon">🌴</span>
+                  <span>
+                    <strong>Retirement</strong>
+                  </span>
+                </button>
+                <button class="goal-card">
+                  <span class="goal-icon">🌱</span>
+                  <span>
+                    <strong>Savings</strong>
+                  </span>
+                </button>
+              </div>
+              <button class="primary full-width">Continue</button>
+              <label class="goals-json">
+                Goals (JSON array)
+                <textarea
+                  id="goals"
+                  rows="4"
+                  placeholder='[{"goal":"Car","target":12000,"timelineMonths":18}]'
+                ></textarea>
+              </label>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div id="goal-modal" class="modal hidden">
+      <div class="modal-overlay" data-close="true"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Add a financial goal</h3>
+          <button class="ghost modal-close" data-close="true">Close</button>
+        </div>
+        <div class="modal-body">
+          <label>
+            Goal name
+            <input id="goal-name" type="text" placeholder="e.g. Emergency fund" />
+          </label>
+          <label>
+            Target amount
+            <input id="goal-target" type="number" placeholder="e.g. 12000" />
+          </label>
+          <label>
+            Timeline (months)
+            <input id="goal-timeline" type="number" placeholder="e.g. 18" />
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button class="secondary" data-close="true">Cancel</button>
+          <button id="goal-save" class="primary">Save goal</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
