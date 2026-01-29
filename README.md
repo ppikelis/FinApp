@@ -6,12 +6,15 @@ Financial Advisor app that analyzes income/spending, assigns categories, support
 
 1. Install dependencies
    - `npm install`
+   - `pip install -r requirements.txt`
 2. Set environment variable
    - `set OPENAI_API_KEY=your_key_here` (PowerShell: `$env:OPENAI_API_KEY="your_key_here"`)
 3. Start the app
    - `npm start`
+   - `streamlit run streamlit_app.py`
 
 Open `http://localhost:3000` in your browser.
+Open `http://localhost:8501` for the Streamlit UI.
 
 ## Notes
 
@@ -19,3 +22,4 @@ Open `http://localhost:3000` in your browser.
 - The API expects JSON arrays for manual expenses and goals.
 - Knowledge base search uses embeddings with chunking and similarity scoring.
   - Initialize via UI or `POST /api/kb/init`, then query via `POST /api/kb/search`.
+- Advanced RAG adds query translation and structured retrieval via `POST /api/kb/advanced`.

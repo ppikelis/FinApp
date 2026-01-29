@@ -198,13 +198,15 @@ async function initKnowledgeBase() {
 async function searchKnowledgeBase() {
   const query = document.getElementById("kb-query").value.trim();
   const topK = Number(document.getElementById("kb-topk").value || 4);
+  const useAdvanced = document.getElementById("kb-advanced")?.checked;
   if (!query) {
     kbResults.textContent = "Please enter a query.";
     return;
   }
 
   kbResults.textContent = "Searching...";
-  const response = await fetch("/api/kb/search", {
+  const endpoint = useAdvanced ? "/api/kb/advanced" : "/api/kb/search";
+  const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query, topK })

@@ -47,6 +47,14 @@ Use USD unless a currency is provided in the input.
 const knowledgeBasePath = path.join(__dirname, "data", "knowledge_base.json");
 let kbChunks = [];
 let kbReady = false;
+const kbTags = [
+  { tag: "budgeting", keywords: ["budget", "budgeting", "cash flow"] },
+  { tag: "emergency", keywords: ["emergency fund", "buffer"] },
+  { tag: "debt", keywords: ["debt", "loan", "interest", "payoff"] },
+  { tag: "investing", keywords: ["invest", "portfolio", "index fund", "allocation"] },
+  { tag: "inflation", keywords: ["inflation", "interest rate", "rates"] },
+  { tag: "goals", keywords: ["goal", "saving goal", "target"] }
+];
 
 function cosineSimilarity(a, b) {
   let dot = 0;
@@ -127,6 +135,13 @@ function chunkText(text, maxChars = 800, overlapChars = 120) {
   return overlapped;
 }
 
+function deriveTags(title, text) {
+  const combined = `${title} ${text}`.toLowerCase();
+  return kbTags
+    .filter((rule) => rule.keywords.some((keyword) => combined.includes(keyword)))
+    .map((rule) => rule.tag);
+}
+
 async function embedTexts(texts) {
   const response = await openai.embeddings.create({
     model: "text-embedding-3-small",
@@ -141,11 +156,13 @@ async function buildKnowledgeBase() {
   const chunks = [];
   docs.forEach((doc) => {
     const docChunks = chunkText(doc.content);
+    const tags = doc.tags && Array.isArray(doc.tags) ? doc.tags : deriveTags(doc.title, doc.content);
     docChunks.forEach((chunk, idx) => {
       chunks.push({
         id: `${doc.id}_${idx + 1}`,
         docId: doc.id,
         title: doc.title,
+        tags,
         text: chunk
       });
     });
@@ -189,6 +206,26 @@ Return JSON with this schema:
 `.trim();
 }
 
+function buildFreeformAnalysisPrompt(text) {
+  return `
+Extract the user's income and expenses from freeform text and analyze them.
+Return JSON only.
+
+Input:
+${text}
+
+Return JSON with this schema:
+{
+  "incomeTotal": number,
+  "expenseTotal": number,
+  "netMonthly": number,
+  "byCategory": [{"category": "string", "total": number}],
+  "insights": ["string"],
+  "items": [{"description": "string", "amount": number, "type": "income|expense", "category": "string"}]
+}
+`.trim();
+}
+
 function buildAdvisorPrompt(payload) {
   return `
 Provide investment insights from current market trends and savings strategies based on the user's profile.
@@ -203,6 +240,28 @@ Return JSON with this schema:
   "marketOverview": "string",
   "insights": ["string"],
   "goalStrategies": [{"goal": "string", "strategy": "string"}]
+}
+
+function buildQueryTranslationPrompt(query) {
+  return `
+Translate the query into English and extract any structured filters.
+Return JSON only.
+
+Input:
+${query}
+
+Return JSON with this schema:
+{
+  "language": "string",
+  "translatedQuery": "string",
+  "filters": {
+    "docIds": ["string"],
+    "tags": ["string"],
+    "mustInclude": ["string"],
+    "exclude": ["string"]
+  }
+}
+`.trim();
 }
 `.trim();
 }
@@ -223,6 +282,28 @@ app.post("/api/analyze", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to analyze data." });
+  }
+});
+
+app.post("/api/analyze-freeform", async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text) {
+      return res.status(400).json({ error: "Missing text." });
+    }
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.2,
+      messages: [
+        { role: "system", content: systemInstructions },
+        { role: "user", content: buildFreeformAnalysisPrompt(text) }
+      ]
+    });
+    const resultText = response.choices[0].message.content || "{}";
+    res.json(JSON.parse(resultText));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to analyze freeform input." });
   }
 });
 
@@ -343,6 +424,83 @@ app.post("/api/kb/search", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to search knowledge base." });
+  }
+});
+
+app.post("/api/kb/advanced", async (req, res) => {
+  try {
+    if (!kbReady) {
+      return res.status(400).json({ error: "Knowledge base not initialized." });
+    }
+    const { query, topK = 5 } = req.body;
+    if (!query) {
+      return res.status(400).json({ error: "Missing query." });
+    }
+
+    const translationResponse = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.2,
+      messages: [
+        { role: "system", content: "Return only valid JSON without markdown." },
+        { role: "user", content: buildQueryTranslationPrompt(query) }
+      ]
+    });
+
+    const translationText = translationResponse.choices[0].message.content || "{}";
+    const translation = JSON.parse(translationText);
+    const translatedQuery = translation.translatedQuery || query;
+    const filters = translation.filters || {};
+    const docIds = Array.isArray(filters.docIds) ? filters.docIds : [];
+    const tags = Array.isArray(filters.tags) ? filters.tags : [];
+    const mustInclude = Array.isArray(filters.mustInclude) ? filters.mustInclude : [];
+    const exclude = Array.isArray(filters.exclude) ? filters.exclude : [];
+
+    const filteredChunks = kbChunks.filter((chunk) => {
+      if (docIds.length > 0 && !docIds.includes(chunk.docId)) {
+        return false;
+      }
+      if (tags.length > 0 && !tags.some((tag) => chunk.tags?.includes(tag))) {
+        return false;
+      }
+      const textLower = chunk.text.toLowerCase();
+      if (mustInclude.length > 0 && !mustInclude.every((term) => textLower.includes(term.toLowerCase()))) {
+        return false;
+      }
+      if (exclude.length > 0 && exclude.some((term) => textLower.includes(term.toLowerCase()))) {
+        return false;
+      }
+      return true;
+    });
+
+    const candidates = filteredChunks.length > 0 ? filteredChunks : kbChunks;
+    const [queryEmbedding] = await embedTexts([translatedQuery]);
+    const scored = candidates.map((chunk) => ({
+      ...chunk,
+      score: cosineSimilarity(queryEmbedding, chunk.embedding)
+    }));
+
+    scored.sort((a, b) => b.score - a.score);
+    const results = scored.slice(0, Math.min(topK, scored.length)).map((item) => ({
+      id: item.id,
+      title: item.title,
+      tags: item.tags || [],
+      text: item.text,
+      score: Number(item.score.toFixed(4))
+    }));
+
+    res.json({
+      query,
+      translation: {
+        language: translation.language || "unknown",
+        translatedQuery,
+        filters: { docIds, tags, mustInclude, exclude },
+        usedFallback: filteredChunks.length === 0
+      },
+      results
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to run advanced retrieval." });
   }
 });
 
