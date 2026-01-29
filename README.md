@@ -16,6 +16,12 @@ Financial Advisor app that analyzes income/spending, assigns categories, support
 Open `http://localhost:3000` in your browser.
 Open `http://localhost:8501` for the Streamlit UI.
 
+## Streamlit Cloud
+
+If you deploy Streamlit separately, set `FINAPP_API_BASE` to your backend URL
+(for example, `https://your-backend.example.com`). Otherwise the app will try
+to connect to `http://localhost:3000`.
+
 ## Notes
 
 - Uploading a bank statement PDF uses `pdf-parse` and ChatGPT for transaction extraction.
