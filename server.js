@@ -241,6 +241,8 @@ Return JSON with this schema:
   "insights": ["string"],
   "goalStrategies": [{"goal": "string", "strategy": "string"}]
 }
+`.trim();
+}
 
 function buildQueryTranslationPrompt(query) {
   return `
@@ -260,8 +262,6 @@ Return JSON with this schema:
     "mustInclude": ["string"],
     "exclude": ["string"]
   }
-}
-`.trim();
 }
 `.trim();
 }
